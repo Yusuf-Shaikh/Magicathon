@@ -19,12 +19,12 @@ function TopBottom({ userImage, captions }: TemplateProps) {
         className="absolute inset-0 h-full w-full object-cover"
       />
       {top && (
-        <p className="meme-font meme-stroke absolute inset-x-3 top-3 break-words text-center text-[clamp(0.95rem,5cqw,2rem)]">
+        <p className="meme-font meme-stroke absolute inset-x-3 top-3 break-words text-center text-[clamp(0.7rem,5cqw,2rem)]">
           {top}
         </p>
       )}
       {bottom && (
-        <p className="meme-font meme-stroke absolute inset-x-3 bottom-3 break-words text-center text-[clamp(0.95rem,5cqw,2rem)]">
+        <p className="meme-font meme-stroke absolute inset-x-3 bottom-3 break-words text-center text-[clamp(0.7rem,5cqw,2rem)]">
           {bottom}
         </p>
       )}
@@ -38,7 +38,7 @@ function Drake({ userImage, captions }: TemplateProps) {
     <div className="grid h-full w-full grid-cols-2 grid-rows-2 bg-white">
       <div className="relative flex items-center justify-center bg-rose-50 p-2">
         <span className="absolute left-1.5 top-1.5 text-base">❌</span>
-        <p className="meme-font break-words text-center text-[clamp(0.7rem,3.6cqw,1.25rem)] text-rose-700">
+        <p className="meme-font break-words text-center text-[clamp(0.55rem,3.6cqw,1.25rem)] text-rose-700">
           {reject}
         </p>
       </div>
@@ -52,7 +52,7 @@ function Drake({ userImage, captions }: TemplateProps) {
       </div>
       <div className="relative flex items-center justify-center bg-emerald-50 p-2">
         <span className="absolute left-1.5 top-1.5 text-base">✅</span>
-        <p className="meme-font break-words text-center text-[clamp(0.7rem,3.6cqw,1.25rem)] text-emerald-700">
+        <p className="meme-font break-words text-center text-[clamp(0.55rem,3.6cqw,1.25rem)] text-emerald-700">
           {approve}
         </p>
       </div>
@@ -80,15 +80,15 @@ function TwoButton({ userImage, captions }: TemplateProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/65" />
       <span className="absolute right-2 top-2 text-xl">💧</span>
       {context && (
-        <p className="meme-font meme-stroke absolute inset-x-3 top-3 break-words text-center text-[clamp(0.85rem,4cqw,1.5rem)]">
+        <p className="meme-font meme-stroke absolute inset-x-3 top-3 break-words text-center text-[clamp(0.65rem,4cqw,1.5rem)]">
           {context}
         </p>
       )}
       <div className="absolute inset-x-3 bottom-3 flex gap-2">
-        <div className="meme-font flex-1 rounded-md bg-rose-500 px-2 py-2 text-center text-[clamp(0.7rem,3.2cqw,1.05rem)] text-white shadow-lg ring-2 ring-rose-300/80">
+        <div className="meme-font flex-1 rounded-md bg-rose-500 px-2 py-2 text-center text-[clamp(0.55rem,3.2cqw,1.05rem)] text-white shadow-lg ring-2 ring-rose-300/80">
           {a}
         </div>
-        <div className="meme-font flex-1 rounded-md bg-sky-500 px-2 py-2 text-center text-[clamp(0.7rem,3.2cqw,1.05rem)] text-white shadow-lg ring-2 ring-sky-300/80">
+        <div className="meme-font flex-1 rounded-md bg-sky-500 px-2 py-2 text-center text-[clamp(0.55rem,3.2cqw,1.05rem)] text-white shadow-lg ring-2 ring-sky-300/80">
           {b}
         </div>
       </div>
@@ -135,7 +135,7 @@ function ExpandingBrain({ userImage, captions }: TemplateProps) {
               i < 3 && "border-b",
             )}
           >
-            <p className="meme-font break-words text-[clamp(0.65rem,2.9cqw,1.05rem)] text-black">
+            <p className="meme-font break-words text-[clamp(0.5rem,2.9cqw,1.05rem)] text-black">
               {line}
             </p>
           </div>
@@ -158,13 +158,13 @@ function ThisIsFine({ userImage, captions }: TemplateProps) {
       <span className="absolute left-2 top-2 text-xl">🔥</span>
       <span className="absolute right-2 top-2 text-xl">🔥</span>
       {fire && (
-        <p className="meme-font meme-stroke absolute inset-x-3 top-10 break-words text-center text-[clamp(0.85rem,4cqw,1.5rem)]">
+        <p className="meme-font meme-stroke absolute inset-x-3 top-10 break-words text-center text-[clamp(0.65rem,4cqw,1.5rem)]">
           {fire}
         </p>
       )}
       {cope && (
         <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white px-3 py-2 text-center shadow-lg">
-          <p className="meme-font break-words text-[clamp(0.8rem,3.6cqw,1.25rem)] text-black">
+          <p className="meme-font break-words text-[clamp(0.6rem,3.6cqw,1.25rem)] text-black">
             {cope}
           </p>
         </div>
@@ -218,7 +218,7 @@ function DistractedBoyfriend({ userImage, captions }: TemplateProps) {
             )}
           >
             <span className="text-sm leading-tight">{l.emoji}</span>
-            <span className="meme-font flex-1 break-words text-[clamp(0.65rem,2.8cqw,0.95rem)] leading-tight">
+            <span className="meme-font flex-1 break-words text-[clamp(0.5rem,2.8cqw,0.95rem)] leading-tight">
               <span className="opacity-70">{l.tag}:</span> {l.text}
             </span>
           </div>
