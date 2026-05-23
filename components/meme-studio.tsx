@@ -50,12 +50,15 @@ export function MemeStudio() {
     return () => window.clearInterval(interval);
   }, [loading]);
 
-  // Restore studio state from sessionStorage when the page is loaded with
-  // ?continue=1 (e.g. user clicked "back to editor" from a share page).
+  // Restore studio state from sessionStorage on every mount — so a plain
+  // browser refresh keeps the user's generated memes, not just the explicit
+  // "back to editor" path. The ?continue=1 URL signal additionally triggers
+  // auto-reopening the editor + scrolling to the studio section.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("continue") !== "1") return;
+    const shouldReopenEditor = params.get("continue") === "1";
+
     try {
       const raw = window.sessionStorage.getItem(STUDIO_STATE_KEY);
       if (!raw) return;
@@ -63,26 +66,30 @@ export function MemeStudio() {
       if (Array.isArray(parsed.concepts) && parsed.imageDataUrl) {
         setConcepts(parsed.concepts);
         setImageDataUrl(parsed.imageDataUrl);
+
         if (
+          shouldReopenEditor &&
           typeof parsed.selectedIndex === "number" &&
           parsed.selectedIndex >= 0
         ) {
           setSelectedIndex(parsed.selectedIndex);
+          // Scroll the studio into view so the user lands at the editor
+          // section, not the hero, when bouncing back from a share page.
+          window.setTimeout(() => {
+            document
+              .getElementById("upload")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 0);
         }
-        // Scroll the studio into view so the user lands at the editor section,
-        // not the hero, when bouncing back from a share page. Defer so the
-        // commit fully lands before scrolling.
-        window.setTimeout(() => {
-          document
-            .getElementById("upload")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 0);
       }
     } catch {
       // ignore — corrupt state, start fresh
     }
-    // Strip the param so a refresh doesn't re-trigger restore
-    window.history.replaceState({}, "", window.location.pathname);
+
+    // Strip the param so a subsequent refresh doesn't re-open the editor
+    if (shouldReopenEditor) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
   }, []);
 
   // Persist studio state on every change so /m/[id]'s back-to-editor
