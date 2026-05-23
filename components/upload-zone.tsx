@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState, type DragEvent } from "react";
-import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
 
 const CameraModal = dynamic(
@@ -134,12 +133,20 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
               {file.name}
             </p>
             <div className="flex shrink-0 gap-1.5">
-              <Button variant="outline" size="sm" onClick={openPicker}>
+              <button
+                type="button"
+                onClick={openPicker}
+                className="inline-flex h-8 items-center justify-center rounded-full border border-acid-deep/70 bg-acid-deep/15 px-3 font-mono text-[10px] uppercase tracking-[0.2em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink"
+              >
                 Replace
-              </Button>
-              <Button variant="ghost" size="sm" onClick={reset}>
+              </button>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex h-8 items-center justify-center rounded-full border border-acid-deep/70 bg-acid-deep/15 px-3 font-mono text-[10px] uppercase tracking-[0.2em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink"
+              >
                 Remove
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -208,27 +215,23 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
-            <Button
-              variant="gradient"
-              size="lg"
+            <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 openPicker();
               }}
-              className="w-full sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-acid-deep/70 bg-acid-deep/15 px-6 font-mono text-sm uppercase tracking-[0.15em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink sm:w-auto"
             >
               Upload
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
+            </button>
+            <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 handleTakePhoto();
               }}
-              className="w-full sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-acid-deep/70 bg-acid-deep/15 px-6 font-mono text-sm uppercase tracking-[0.15em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink sm:w-auto"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -244,7 +247,7 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
                 <path d="M3 7h3l2-3h8l2 3h3v14H3V7z" />
               </svg>
               Take photo
-            </Button>
+            </button>
           </div>
 
           <p className="text-xs text-muted-foreground">

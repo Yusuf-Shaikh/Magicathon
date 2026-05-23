@@ -69,6 +69,14 @@ export function MemeStudio() {
         ) {
           setSelectedIndex(parsed.selectedIndex);
         }
+        // Scroll the studio into view so the user lands at the editor section,
+        // not the hero, when bouncing back from a share page. Defer so the
+        // commit fully lands before scrolling.
+        window.setTimeout(() => {
+          document
+            .getElementById("upload")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 0);
       }
     } catch {
       // ignore — corrupt state, start fresh
@@ -79,10 +87,20 @@ export function MemeStudio() {
 
   // Persist studio state on every change so /m/[id]'s back-to-editor
   // button can restore exactly what the user was working on.
+  // Merges with existing storage so external fields (e.g. lastSavedMemeId
+  // written by EditorModal after save) survive subsequent state updates.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (concepts.length > 0 && imageDataUrl) {
-      const state: PersistedStudioState = {
+      let existing: Record<string, unknown> = {};
+      try {
+        const raw = window.sessionStorage.getItem(STUDIO_STATE_KEY);
+        if (raw) existing = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        // ignore
+      }
+      const state = {
+        ...existing,
         concepts,
         imageDataUrl,
         selectedIndex,
@@ -189,7 +207,7 @@ export function MemeStudio() {
                 ) : (
                   <span>
                     Six fresh{" "}
-                    <span className="text-gradient-brand">memes</span>
+                    <span className="text-hot">memes</span>
                   </span>
                 )}
               </h2>

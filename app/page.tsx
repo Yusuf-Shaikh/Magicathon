@@ -109,8 +109,6 @@ export default async function HomePage() {
             <span>
               <span className="text-acid">{stats.reactions}</span> reactions
             </span>
-            <span className="text-acid">·</span>
-            <span>no signup</span>
           </div>
         </div>
 

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BackToEditorLink } from "@/components/back-to-editor-link";
 import { ReactionsBar } from "@/components/reactions-bar";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { ShareActions } from "@/components/share-actions";
+import { ShareCallToActions } from "@/components/share-call-to-actions";
 import { siteConfig } from "@/lib/site";
 import { supabase } from "@/lib/supabase";
 import { absoluteUrl } from "@/lib/utils";
@@ -98,80 +99,52 @@ export default async function MemePage({ params }: PageProps) {
 
   return (
     <main className="min-h-dvh">
-      <div className="mx-auto max-w-2xl px-5 py-8 sm:py-12 lg:max-w-6xl">
-        {/* Header — spans full width */}
-        <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center justify-between duration-300">
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            ← back
-          </Link>
-          <span className="rounded-full bg-acid px-2 py-0.5 font-mono text-xs lowercase text-ink">
+      <ScrollToTop />
+      <div className="mx-auto flex max-w-2xl flex-col items-center px-5 py-6 sm:py-10">
+        {/* Header — centered caption, no back button */}
+        <div className="animate-in fade-in slide-in-from-top-2 mb-5 flex items-center justify-center gap-3 duration-300">
+          <span aria-hidden className="h-1 w-1 rounded-full bg-acid" />
+          <p className="font-mono text-sm lowercase tracking-wide text-muted-foreground">
             {meme.title || meme.template}
-          </span>
+          </p>
+          <span aria-hidden className="h-1 w-1 rounded-full bg-acid" />
         </div>
 
-        {/* Image left · CTAs right on lg+, stacked on mobile/tablet */}
-        <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-10">
-          <div
-            className="animate-in fade-in slide-in-from-bottom-3 overflow-hidden rounded-3xl border border-foreground/10 bg-card/40 shadow-2xl backdrop-blur-xl duration-500"
-            style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={meme.image_url}
-              alt="meme"
-              className="block aspect-square w-full bg-black object-contain"
-            />
-          </div>
+        {/* Image — capped so the whole page fits in a laptop viewport */}
+        <div
+          className="animate-in fade-in slide-in-from-bottom-3 mb-5 aspect-square w-full overflow-hidden rounded-3xl border border-foreground/10 bg-card/40 shadow-2xl backdrop-blur-xl duration-500"
+          style={{
+            maxWidth: "min(28rem, 55vh)",
+            animationDelay: "80ms",
+            animationFillMode: "backwards",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={meme.image_url}
+            alt="meme"
+            className="block h-full w-full bg-black object-contain"
+          />
+        </div>
 
-          <div className="flex flex-col gap-6 lg:sticky lg:top-20">
-            <div
-              className="animate-in fade-in duration-500"
-              style={{
-                animationDelay: "200ms",
-                animationFillMode: "backwards",
-              }}
-            >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                react
-              </p>
-              <ReactionsBar
-                memeId={meme.id}
-                initialCounts={initialReactionCounts}
-              />
-            </div>
+        {/* Reactions */}
+        <div
+          className="animate-in fade-in mb-4 duration-500"
+          style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
+        >
+          <ReactionsBar
+            memeId={meme.id}
+            initialCounts={initialReactionCounts}
+          />
+        </div>
 
-            <div
-              className="animate-in fade-in duration-500"
-              style={{
-                animationDelay: "300ms",
-                animationFillMode: "backwards",
-              }}
-            >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                share
-              </p>
-              <ShareActions url={shareUrl} />
-            </div>
-
-            <div
-              className="animate-in fade-in flex flex-col gap-3 border-t border-foreground/10 pt-5 duration-500"
-              style={{
-                animationDelay: "400ms",
-                animationFillMode: "backwards",
-              }}
-            >
-              <BackToEditorLink />
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                ✨ make another
-              </Link>
-            </div>
-          </div>
+        {/* Combined share + CTA row — copy/share circles next to creator/viewer buttons */}
+        <div
+          className="animate-in fade-in flex flex-wrap items-center justify-center gap-3 duration-500"
+          style={{ animationDelay: "320ms", animationFillMode: "backwards" }}
+        >
+          <ShareActions url={shareUrl} />
+          <ShareCallToActions memeId={meme.id} />
         </div>
       </div>
     </main>

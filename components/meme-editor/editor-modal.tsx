@@ -125,6 +125,21 @@ export default function EditorModal({
         throw new Error(body.error || `Save failed (${res.status})`);
       }
       const { id } = (await res.json()) as { id: string };
+      // Stamp the saved meme id onto persisted studio state so the share
+      // page can identify the creator and offer back-to-editor.
+      try {
+        const raw = window.sessionStorage.getItem("cursed-studio-state");
+        if (raw) {
+          const parsed = JSON.parse(raw) as Record<string, unknown>;
+          parsed.lastSavedMemeId = id;
+          window.sessionStorage.setItem(
+            "cursed-studio-state",
+            JSON.stringify(parsed),
+          );
+        }
+      } catch {
+        // sessionStorage unavailable — non-fatal
+      }
       router.push(`/m/${id}`);
     } catch (e) {
       setSaveState({
