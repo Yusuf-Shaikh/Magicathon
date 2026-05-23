@@ -1,8 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, useState, type DragEvent } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
+
+const CameraModal = dynamic(
+  () => import("@/components/camera-modal").then((m) => m.CameraModal),
+  { ssr: false },
+);
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPTED = ["image/png", "image/jpeg", "image/webp"];
@@ -15,10 +21,12 @@ interface UploadZoneProps {
 
 export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   const openPicker = () => inputRef.current?.click();
 
@@ -38,6 +46,21 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
       return URL.createObjectURL(f);
     });
     onFileAccepted?.(f);
+  };
+
+  const handleTakePhoto = () => {
+    // Prefer the in-browser webcam modal everywhere — works on desktop AND
+    // mobile browsers. Only fall back to the native file input if
+    // mediaDevices isn't available (old browser, http+remote, etc.).
+    const hasGetUserMedia =
+      typeof navigator !== "undefined" &&
+      typeof navigator.mediaDevices !== "undefined" &&
+      typeof navigator.mediaDevices.getUserMedia === "function";
+    if (hasGetUserMedia) {
+      setShowCameraModal(true);
+    } else {
+      cameraInputRef.current?.click();
+    }
   };
 
   const reset = () => {
@@ -79,6 +102,21 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
     />
   );
 
+  const cameraInput = (
+    <input
+      ref={cameraInputRef}
+      type="file"
+      accept="image/*"
+      capture="user"
+      className="hidden"
+      onChange={(e) => {
+        const f = e.target.files?.[0];
+        if (f) acceptFile(f);
+        e.target.value = "";
+      }}
+    />
+  );
+
   if (file && previewUrl) {
     return (
       <div className="w-full lg:h-full">
@@ -106,20 +144,29 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
           </div>
         </div>
         {hiddenInput}
+        {cameraInput}
+        {showCameraModal && (
+          <CameraModal
+            onCapture={(f) => {
+              setShowCameraModal(false);
+              acceptFile(f);
+            }}
+            onClose={() => setShowCameraModal(false)}
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <button
-        type="button"
+      <div
         onClick={openPicker}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "group relative block w-full overflow-hidden rounded-3xl border-2 border-dashed bg-card/40 p-8 text-left outline-none backdrop-blur-xl transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-12",
+          "group relative w-full cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed bg-card/40 p-8 backdrop-blur-xl transition-all sm:p-12",
           isDragging
             ? "scale-[1.01] border-acid/60 bg-acid/5"
             : "border-foreground/15 hover:border-foreground/30",
@@ -129,7 +176,7 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-br from-acid/5 via-transparent to-hot/5"
         />
-        <span className="relative flex flex-col items-center gap-5 text-center">
+        <div className="relative flex flex-col items-center gap-5 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-acid ring-2 ring-acid-deep/50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -148,32 +195,63 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
             </svg>
           </span>
 
-          <span className="space-y-1.5">
-            <span className="block text-lg font-medium">
+          <div className="space-y-1.5">
+            <p className="text-lg font-medium">
               {isDragging
                 ? "Drop it like it's hot"
                 : "Drop an image to get started"}
-            </span>
-            <span className="block text-sm text-muted-foreground">
+            </p>
+            <p className="text-sm text-muted-foreground">
               Selfies, pets, screenshots, reaction shots &mdash; the weirder,
               the better.
-            </span>
-          </span>
+            </p>
+          </div>
 
-          <span
-            className={cn(
-              buttonVariants({ variant: "gradient", size: "lg" }),
-              "mt-1 w-full sm:w-auto",
-            )}
-          >
-            Choose image
-          </span>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
+            <Button
+              variant="gradient"
+              size="lg"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openPicker();
+              }}
+              className="w-full sm:w-auto"
+            >
+              Upload
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTakePhoto();
+              }}
+              className="w-full sm:w-auto"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden
+              >
+                <circle cx="12" cy="13" r="4" />
+                <path d="M3 7h3l2-3h8l2 3h3v14H3V7z" />
+              </svg>
+              Take photo
+            </Button>
+          </div>
 
-          <span className="block text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             PNG, JPG, WEBP &middot; up to 10&nbsp;MB
-          </span>
-        </span>
-      </button>
+          </p>
+        </div>
+      </div>
 
       {error && (
         <p
@@ -185,6 +263,16 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
       )}
 
       {hiddenInput}
+      {cameraInput}
+      {showCameraModal && (
+        <CameraModal
+          onCapture={(f) => {
+            setShowCameraModal(false);
+            acceptFile(f);
+          }}
+          onClose={() => setShowCameraModal(false)}
+        />
+      )}
     </div>
   );
 }

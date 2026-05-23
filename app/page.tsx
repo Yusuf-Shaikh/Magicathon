@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Marquee } from "@/components/marquee";
 import { MemeStudio } from "@/components/meme-studio";
-import {
-  fetchRankedMemes,
-  fetchStats,
-  type RankedMeme,
-} from "@/lib/memes";
+import { fetchRankedMemes, fetchStats, type RankedMeme } from "@/lib/memes";
 
 export const dynamic = "force-dynamic";
 
@@ -123,7 +119,7 @@ export default async function HomePage() {
           aria-label="Scroll to upload"
           className="group absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:bottom-10"
         >
-          <span>scroll for more</span>
+          <span>scroll to upload</span>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -157,8 +153,7 @@ export default async function HomePage() {
               01 / Drop a photo
             </span>
             <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              Pick something with{" "}
-              <span className="text-hot">personality</span>
+              Pick something with <span className="text-hot">personality</span>
               <span className="text-hot">.</span>
             </h2>
             <p className="mt-3 max-w-md text-sm text-muted-foreground sm:text-base">
@@ -176,15 +171,17 @@ export default async function HomePage() {
           <div className="mx-auto max-w-3xl px-5 py-16 sm:py-20">
             <div
               className="mb-8 flex items-end justify-between gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500"
-              style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
+              style={{
+                animationDelay: "150ms",
+                animationFillMode: "backwards",
+              }}
             >
               <div>
                 <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
                   02 / Right now
                 </span>
                 <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                  What people are{" "}
-                  <span className="text-acid">making</span>
+                  What people are <span className="text-acid">making</span>
                   <span className="text-acid">.</span>
                 </h2>
               </div>

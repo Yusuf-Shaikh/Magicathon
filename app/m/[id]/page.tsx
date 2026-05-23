@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BackToEditorLink } from "@/components/back-to-editor-link";
 import { ReactionsBar } from "@/components/reactions-bar";
 import { ShareActions } from "@/components/share-actions";
 import { siteConfig } from "@/lib/site";
@@ -97,8 +98,9 @@ export default async function MemePage({ params }: PageProps) {
 
   return (
     <main className="min-h-dvh">
-      <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 px-5 py-10 sm:py-14">
-        <div className="animate-in fade-in slide-in-from-top-2 flex items-center justify-between duration-300">
+      <div className="mx-auto max-w-2xl px-5 py-8 sm:py-12 lg:max-w-6xl">
+        {/* Header — spans full width */}
+        <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center justify-between duration-300">
           <Link
             href="/"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -110,39 +112,66 @@ export default async function MemePage({ params }: PageProps) {
           </span>
         </div>
 
-        <div
-          className="animate-in fade-in slide-in-from-bottom-3 overflow-hidden rounded-3xl border border-paper/10 bg-card/40 shadow-2xl backdrop-blur-xl duration-500"
-          style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={meme.image_url}
-            alt="meme"
-            className="block aspect-square w-full bg-black object-contain"
-          />
-        </div>
-
-        <div
-          className="animate-in fade-in duration-500"
-          style={{ animationDelay: "260ms", animationFillMode: "backwards" }}
-        >
-          <ReactionsBar
-            memeId={meme.id}
-            initialCounts={initialReactionCounts}
-          />
-        </div>
-
-        <div
-          className="animate-in fade-in flex flex-col items-center gap-3 duration-500"
-          style={{ animationDelay: "360ms", animationFillMode: "backwards" }}
-        >
-          <ShareActions url={shareUrl} />
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+        {/* Image left · CTAs right on lg+, stacked on mobile/tablet */}
+        <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-10">
+          <div
+            className="animate-in fade-in slide-in-from-bottom-3 overflow-hidden rounded-3xl border border-foreground/10 bg-card/40 shadow-2xl backdrop-blur-xl duration-500"
+            style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
           >
-            ✨ make your own
-          </Link>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={meme.image_url}
+              alt="meme"
+              className="block aspect-square w-full bg-black object-contain"
+            />
+          </div>
+
+          <div className="flex flex-col gap-6 lg:sticky lg:top-20">
+            <div
+              className="animate-in fade-in duration-500"
+              style={{
+                animationDelay: "200ms",
+                animationFillMode: "backwards",
+              }}
+            >
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                react
+              </p>
+              <ReactionsBar
+                memeId={meme.id}
+                initialCounts={initialReactionCounts}
+              />
+            </div>
+
+            <div
+              className="animate-in fade-in duration-500"
+              style={{
+                animationDelay: "300ms",
+                animationFillMode: "backwards",
+              }}
+            >
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                share
+              </p>
+              <ShareActions url={shareUrl} />
+            </div>
+
+            <div
+              className="animate-in fade-in flex flex-col gap-3 border-t border-foreground/10 pt-5 duration-500"
+              style={{
+                animationDelay: "400ms",
+                animationFillMode: "backwards",
+              }}
+            >
+              <BackToEditorLink />
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                ✨ make another
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </main>

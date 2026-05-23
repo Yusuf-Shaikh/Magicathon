@@ -21,6 +21,14 @@ const LOADING_PHRASES = [
   "almost there…",
 ];
 
+// Persisted shape — sessionStorage key + serialization type
+const STUDIO_STATE_KEY = "cursed-studio-state";
+interface PersistedStudioState {
+  concepts: MemeConcept[];
+  imageDataUrl: string;
+  selectedIndex: number | null;
+}
+
 export function MemeStudio() {
   const [concepts, setConcepts] = useState<MemeConcept[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +49,54 @@ export function MemeStudio() {
     }, 2500);
     return () => window.clearInterval(interval);
   }, [loading]);
+
+  // Restore studio state from sessionStorage when the page is loaded with
+  // ?continue=1 (e.g. user clicked "back to editor" from a share page).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("continue") !== "1") return;
+    try {
+      const raw = window.sessionStorage.getItem(STUDIO_STATE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as PersistedStudioState;
+      if (Array.isArray(parsed.concepts) && parsed.imageDataUrl) {
+        setConcepts(parsed.concepts);
+        setImageDataUrl(parsed.imageDataUrl);
+        if (
+          typeof parsed.selectedIndex === "number" &&
+          parsed.selectedIndex >= 0
+        ) {
+          setSelectedIndex(parsed.selectedIndex);
+        }
+      }
+    } catch {
+      // ignore — corrupt state, start fresh
+    }
+    // Strip the param so a refresh doesn't re-trigger restore
+    window.history.replaceState({}, "", window.location.pathname);
+  }, []);
+
+  // Persist studio state on every change so /m/[id]'s back-to-editor
+  // button can restore exactly what the user was working on.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (concepts.length > 0 && imageDataUrl) {
+      const state: PersistedStudioState = {
+        concepts,
+        imageDataUrl,
+        selectedIndex,
+      };
+      try {
+        window.sessionStorage.setItem(
+          STUDIO_STATE_KEY,
+          JSON.stringify(state),
+        );
+      } catch {
+        // sessionStorage may be unavailable (privacy mode) — ignore
+      }
+    }
+  }, [concepts, imageDataUrl, selectedIndex]);
 
   const generate = async (file: File) => {
     abortRef.current?.abort();
@@ -91,6 +147,9 @@ export function MemeStudio() {
     setImageDataUrl(null);
     setLoading(false);
     setSelectedIndex(null);
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(STUDIO_STATE_KEY);
+    }
   };
 
   const retry = () => {
