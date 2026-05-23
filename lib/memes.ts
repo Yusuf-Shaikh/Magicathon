@@ -1,5 +1,25 @@
 import { supabase } from "@/lib/supabase";
 
+export interface SiteStats {
+  memes: number;
+  reactions: number;
+}
+
+/**
+ * Total counts across the site — used in the hero strip.
+ * Head queries with exact count: cheap, no row payload.
+ */
+export async function fetchStats(): Promise<SiteStats> {
+  const [memes, reactions] = await Promise.all([
+    supabase.from("memes").select("*", { count: "exact", head: true }),
+    supabase.from("reactions").select("*", { count: "exact", head: true }),
+  ]);
+  return {
+    memes: memes.count ?? 0,
+    reactions: reactions.count ?? 0,
+  };
+}
+
 export interface RankedMeme {
   id: string;
   imageUrl: string;

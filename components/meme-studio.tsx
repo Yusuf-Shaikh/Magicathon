@@ -69,7 +69,12 @@ export function MemeStudio() {
       }
       const data = (await res.json()) as { concepts: MemeConcept[] };
       if (ac.signal.aborted) return;
-      setConcepts(data.concepts ?? []);
+      // Rank by confidence (highest first) so the best meme is top-left.
+      // Stable sort preserves AI's original order on ties.
+      const ranked = [...(data.concepts ?? [])].sort(
+        (a, b) => b.confidence - a.confidence,
+      );
+      setConcepts(ranked);
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "Something went wrong.");

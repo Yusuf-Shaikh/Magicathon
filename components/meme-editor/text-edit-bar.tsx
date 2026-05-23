@@ -41,8 +41,40 @@ export function TextEditBar({
 
   if (selectedSlot === null || !slotLabel || !edit) {
     return (
-      <div className="rounded-xl border border-dashed border-foreground/15 bg-card/40 px-4 py-3 text-center text-sm text-muted-foreground">
-        Tap a caption on the meme to edit it. Drag any caption to reposition.
+      <div className="rounded-xl border border-acid/30 bg-card/40 p-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-acid">
+          How to edit
+        </p>
+        <ol className="mt-3 space-y-2">
+          <li className="flex items-baseline gap-3 text-sm">
+            <span className="font-mono text-base font-bold text-acid">1.</span>
+            <span className="font-medium text-foreground">
+              Tap a caption on the meme to edit its text.
+            </span>
+          </li>
+          <li className="flex items-baseline gap-3 text-sm">
+            <span className="font-mono text-base font-bold text-acid">2.</span>
+            <span className="font-medium text-foreground">
+              Drag any caption to reposition it.
+            </span>
+          </li>
+          <li className="flex items-baseline gap-3 text-sm">
+            <span className="font-mono text-base font-bold text-acid">3.</span>
+            <span className="font-medium text-foreground">
+              Tweak font, size, color and outline below.
+            </span>
+          </li>
+          <li className="flex items-baseline gap-3 text-sm">
+            <span className="font-mono text-base font-bold text-acid">4.</span>
+            <span className="font-medium text-foreground">
+              Hit{" "}
+              <span className="rounded bg-acid px-1 font-mono text-xs text-ink">
+                save &amp; share
+              </span>{" "}
+              when you&rsquo;re done.
+            </span>
+          </li>
+        </ol>
       </div>
     );
   }

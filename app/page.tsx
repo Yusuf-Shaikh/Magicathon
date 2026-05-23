@@ -1,11 +1,19 @@
 import Link from "next/link";
+import { Marquee } from "@/components/marquee";
 import { MemeStudio } from "@/components/meme-studio";
-import { fetchRankedMemes, type RankedMeme } from "@/lib/memes";
+import {
+  fetchRankedMemes,
+  fetchStats,
+  type RankedMeme,
+} from "@/lib/memes";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const trending = await fetchRankedMemes(6);
+  const [trending, stats] = await Promise.all([
+    fetchRankedMemes(6),
+    fetchStats(),
+  ]);
 
   return (
     <main>
@@ -13,11 +21,69 @@ export default async function HomePage() {
       <section className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center overflow-hidden border-b border-foreground/10">
         <div className="hero-glow" />
         <div className="hero-grid" />
+
+        {/* Floating decorative ✦ stars — rotate at different speeds/directions */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-[6%] top-[18%] hidden text-5xl text-acid/50 sm:block sm:text-7xl"
+        >
+          <span
+            className="inline-block animate-spin"
+            style={{ animationDuration: "32s" }}
+          >
+            ✦
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute right-[8%] top-[14%] hidden text-4xl text-hot/50 sm:block sm:text-6xl"
+        >
+          <span
+            className="inline-block animate-spin"
+            style={{
+              animationDuration: "24s",
+              animationDirection: "reverse",
+            }}
+          >
+            ✦
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute bottom-[24%] left-[12%] hidden text-3xl text-acid/40 sm:block sm:text-5xl"
+        >
+          <span
+            className="inline-block animate-spin"
+            style={{ animationDuration: "44s" }}
+          >
+            ✦
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute bottom-[22%] right-[10%] hidden text-4xl text-hot/40 sm:block sm:text-6xl"
+        >
+          <span
+            className="inline-block animate-spin"
+            style={{
+              animationDuration: "38s",
+              animationDirection: "reverse",
+            }}
+          >
+            ✦
+          </span>
+        </span>
+
         <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-              <span className="text-acid">✦</span> The meme maker that
-              doesn&rsquo;t suck
+              <span
+                className="inline-block animate-spin text-acid"
+                style={{ animationDuration: "12s" }}
+              >
+                ✦
+              </span>{" "}
+              The meme maker that doesn&rsquo;t suck
             </span>
             <h1 className="mt-7 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl">
               Make memes
@@ -32,6 +98,24 @@ export default async function HomePage() {
               in the photo and hands you six memes worth sharing.
             </p>
           </div>
+
+          <div
+            className="animate-in fade-in mt-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground duration-500 sm:gap-x-5"
+            style={{
+              animationDelay: "200ms",
+              animationFillMode: "backwards",
+            }}
+          >
+            <span>
+              <span className="text-acid">{stats.memes}</span> memes made
+            </span>
+            <span className="text-acid">·</span>
+            <span>
+              <span className="text-acid">{stats.reactions}</span> reactions
+            </span>
+            <span className="text-acid">·</span>
+            <span>no signup</span>
+          </div>
         </div>
 
         <a
@@ -39,7 +123,7 @@ export default async function HomePage() {
           aria-label="Scroll to upload"
           className="group absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:bottom-10"
         >
-          <span>scroll to upload</span>
+          <span>scroll for more</span>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -55,6 +139,9 @@ export default async function HomePage() {
           </svg>
         </a>
       </section>
+
+      {/* MARQUEE — ink ticker */}
+      <Marquee />
 
       {/* UPLOAD — paper */}
       <section
@@ -116,6 +203,27 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* FOOTER */}
+      <footer className="border-t border-foreground/10">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-5 py-12 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <p className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              may the best <span className="text-acid">meme</span> win
+              <span className="text-acid">.</span>
+            </p>
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              cursed.ai · built for the magicathon
+            </p>
+          </div>
+          <Link
+            href="#upload"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            back to top ↑
+          </Link>
+        </div>
+      </footer>
     </main>
   );
 }

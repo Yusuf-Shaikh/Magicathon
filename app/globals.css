@@ -110,6 +110,24 @@
     );
   }
 
+  /* Horizontal scrolling marquee. Track contains two copies of content;
+     animation translates by -50% so the loop is seamless. */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee-track {
+    animation: marquee 45s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
   /* Faint grid lines that fade with a radial mask */
   .hero-grid {
     position: absolute;
