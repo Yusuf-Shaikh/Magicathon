@@ -1,10 +1,35 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import {
+  Bricolage_Grotesque,
+  JetBrains_Mono,
+  Space_Grotesk,
+} from "next/font/google";
+import { Navbar } from "@/components/navbar";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
+
+const bodyFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const displayFont = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const monoFont = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0c",
+  themeColor: "#0c0c0a",
   width: "device-width",
   initialScale: 1,
 };
@@ -37,20 +62,21 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         baseTheme: dark,
-        variables: { colorPrimary: "#a855f7", colorBackground: "#0a0a0c" },
+        variables: { colorPrimary: "#c6f24e", colorBackground: "#0c0c0a" },
         elements: {
-          card: "bg-card/80 backdrop-blur-xl border border-white/10",
+          card: "bg-card/80 backdrop-blur-xl border border-paper/10",
           formButtonPrimary:
-            "bg-gradient-to-br from-violet-500 via-fuchsia-500 to-rose-500 text-white hover:brightness-110",
+            "bg-acid text-ink hover:bg-acid-deep",
         },
       }}
     >
       <html
         lang="en"
-        className={`${GeistSans.variable} ${GeistMono.variable} dark`}
+        className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable} dark`}
         suppressHydrationWarning
       >
         <body className="min-h-dvh font-sans">
+          <Navbar />
           {children}
         </body>
       </html>

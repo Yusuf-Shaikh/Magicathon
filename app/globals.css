@@ -4,72 +4,156 @@
 
 @layer base {
   :root {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 8% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 8% 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 6% 10%;
-    --secondary: 240 4% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 14%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 4% 14%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 263 70% 60%;
-    --radius: 0.75rem;
-  }
+    /* Palette — HSL channels so they work with Tailwind opacity modifiers */
+    --ink: 60 9% 4%;         /* #0c0c0a */
+    --ink-2: 60 9% 9%;       /* #161613 */
+    --paper: 45 35% 93%;     /* #f4f1e8 */
+    --paper-2: 43 33% 89%;   /* #ece7d8 */
+    --acid: 75 86% 63%;      /* #c6f24e */
+    --acid-deep: 75 100% 41%;/* #9fd400 */
+    --hot: 9 100% 60%;       /* #ff5436 */
 
-  * {
-    @apply border-border;
+    /* shadcn semantic mappings */
+    --background: var(--ink);
+    --foreground: var(--paper);
+    --card: var(--ink-2);
+    --card-foreground: var(--paper);
+    --popover: var(--ink-2);
+    --popover-foreground: var(--paper);
+    --primary: var(--acid);
+    --primary-foreground: var(--ink);
+    --secondary: var(--ink-2);
+    --secondary-foreground: var(--paper);
+    --muted: var(--ink-2);
+    --muted-foreground: 43 15% 65%;
+    --accent: var(--acid);
+    --accent-foreground: var(--ink);
+    --destructive: var(--hot);
+    --destructive-foreground: var(--paper);
+    --border: var(--paper);
+    --input: var(--paper);
+    --ring: var(--acid);
+    --radius: 0.75rem;
   }
 
   html {
     color-scheme: dark;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(at 20% 0%, hsl(263 60% 14% / 0.25) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsl(290 60% 14% / 0.2) 0px, transparent 50%);
-    background-attachment: fixed;
+    font-family: var(--font-body), system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    letter-spacing: -0.015em;
+  }
+
   ::selection {
-    @apply bg-violet-500/30 text-white;
+    @apply bg-acid/30 text-foreground;
+  }
+}
+
+@layer components {
+  /* Section-level theme swap: light/paper mode within a section.
+     Any component inside that uses semantic vars (bg-card, text-foreground,
+     border-foreground, text-muted-foreground, etc.) automatically adapts. */
+  .paper-section {
+    background-color: hsl(var(--paper));
+    color: hsl(var(--ink));
+    color-scheme: light;
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card: var(--paper-2);
+    --card-foreground: var(--ink);
+    --popover: var(--paper-2);
+    --popover-foreground: var(--ink);
+    --muted: var(--paper-2);
+    --muted-foreground: 60 8% 35%;
+    --border: var(--ink);
+    --input: var(--ink);
+  }
+
+  /* Counter-swap: force dark theme on an element regardless of ancestor.
+     Used by the editor modal so it stays dark even when opened from a
+     paper-themed section. */
+  .dark-section {
+    background-color: hsl(var(--ink));
+    color: hsl(var(--paper));
+    color-scheme: dark;
+    --background: var(--ink);
+    --foreground: var(--paper);
+    --card: var(--ink-2);
+    --card-foreground: var(--paper);
+    --popover: var(--ink-2);
+    --popover-foreground: var(--paper);
+    --muted: var(--ink-2);
+    --muted-foreground: 43 15% 65%;
+    --border: var(--paper);
+    --input: var(--paper);
+  }
+
+  /* Soft acid bloom for hero sections */
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 65% 50% at 50% 0%,
+      hsl(var(--acid) / 0.14),
+      transparent 70%
+    );
+  }
+
+  /* Faint grid lines that fade with a radial mask */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, hsl(var(--paper) / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--paper) / 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 50% at 50% 0%,
+      black,
+      transparent 70%
+    );
+    mask-image: radial-gradient(
+      ellipse 70% 50% at 50% 0%,
+      black,
+      transparent 70%
+    );
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      hsl(0 0% 100%) 0%,
-      hsl(240 10% 70%) 100%
-    );
-  }
-
   .text-gradient-brand {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(
       135deg,
-      hsl(263 90% 78%) 0%,
-      hsl(295 90% 70%) 50%,
-      hsl(345 90% 70%) 100%
+      hsl(var(--acid)) 0%,
+      hsl(var(--acid-deep)) 100%
+    );
+  }
+
+  /* On paper backgrounds the bright acid blends with cream — drop into
+     darker shades for legibility. */
+  .paper-section .text-gradient-brand {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--acid-deep)) 0%,
+      hsl(9 100% 42%) 100%
     );
   }
 
   .glass {
-    @apply border border-white/5 bg-card/60 backdrop-blur-xl;
+    @apply border border-paper/10 bg-card/60 backdrop-blur-xl;
   }
 
   .scrollbar-thin {
@@ -80,6 +164,22 @@
     height: 8px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-white/10;
+    @apply rounded-full bg-paper/10;
+  }
+
+  .meme-font {
+    font-family: Impact, "Anton", "Haettenschweiler", "Franklin Gothic Bold",
+      "Arial Black", sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+  }
+
+  .meme-stroke {
+    color: #fff;
+    -webkit-text-stroke: 0.04em #000;
+    paint-order: stroke fill;
+    text-shadow: 0 0.05em 0.05em rgba(0, 0, 0, 0.7);
   }
 }

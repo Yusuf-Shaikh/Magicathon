@@ -1,63 +1,144 @@
 import Link from "next/link";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
-import { Button } from "@/components/ui/button";
-import { checkSupabaseConnection } from "@/lib/supabase";
+import { MemeStudio } from "@/components/meme-studio";
+import { fetchRankedMemes, type RankedMeme } from "@/lib/memes";
 
-export default async function Home() {
-  const user = await currentUser();
-  const name =
-    user?.firstName ??
-    user?.username ??
-    user?.emailAddresses[0]?.emailAddress ??
-    "there";
+export const dynamic = "force-dynamic";
 
-  const supabaseStatus = user ? await checkSupabaseConnection() : null;
+export default async function HomePage() {
+  const trending = await fetchRankedMemes(6);
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4">
-      <SignedOut>
-        <div className="w-full max-w-sm text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-gradient-brand">
-            Magicathon
-          </h1>
-          <div className="mt-8 flex flex-col gap-3">
-            <Button asChild variant="gradient" size="lg">
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/sign-up">Sign up</Link>
-            </Button>
+    <main>
+      {/* HERO — ink (full viewport height below navbar) */}
+      <section className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center overflow-hidden border-b border-foreground/10">
+        <div className="hero-glow" />
+        <div className="hero-grid" />
+        <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+              <span className="text-acid">✦</span> The meme maker that
+              doesn&rsquo;t suck
+            </span>
+            <h1 className="mt-7 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl">
+              Make memes
+              <br />
+              from your own
+              <br />
+              photos
+              <span className="text-acid">.</span>
+            </h1>
+            <p className="mx-auto mt-7 max-w-xl text-base text-muted-foreground sm:text-lg">
+              Drop in any image. A vision model riffs on what&rsquo;s actually
+              in the photo and hands you six memes worth sharing.
+            </p>
           </div>
         </div>
-      </SignedOut>
 
-      <SignedIn>
-        <div className="absolute right-4 top-4">
-          <UserButton afterSignOutUrl="/" />
+        <a
+          href="#upload"
+          aria-label="Scroll to upload"
+          className="group absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:bottom-10"
+        >
+          <span>scroll to upload</span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className="h-4 w-4 animate-bounce text-acid"
+          >
+            <path d="M12 5v14" />
+            <path d="m5 12 7 7 7-7" />
+          </svg>
+        </a>
+      </section>
+
+      {/* UPLOAD — paper */}
+      <section
+        id="upload"
+        className="paper-section scroll-mt-20 border-b border-foreground/10"
+      >
+        <div className="mx-auto max-w-3xl px-5 py-16 sm:py-20 lg:max-w-6xl">
+          <div
+            className="mb-10 animate-in fade-in slide-in-from-bottom-2 duration-500"
+            style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
+          >
+            <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+              01 / Drop a photo
+            </span>
+            <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              Pick something with{" "}
+              <span className="text-hot">personality</span>
+              <span className="text-hot">.</span>
+            </h2>
+            <p className="mt-3 max-w-md text-sm text-muted-foreground sm:text-base">
+              Selfies, pets, screenshots, reaction shots &mdash; the weirder,
+              the better.
+            </p>
+          </div>
+          <MemeStudio />
         </div>
-        <div className="flex flex-col items-center gap-5">
-          <h1 className="text-4xl font-semibold tracking-tight">
-            Hello, <span className="text-gradient-brand">{name}</span>.
-          </h1>
-          {supabaseStatus && (
+      </section>
+
+      {/* TRENDING — ink */}
+      {trending.length > 0 && (
+        <section className="relative">
+          <div className="mx-auto max-w-3xl px-5 py-16 sm:py-20">
             <div
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${
-                supabaseStatus.ok
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                  : "border-rose-500/30 bg-rose-500/10 text-rose-300"
-              }`}
+              className="mb-8 flex items-end justify-between gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500"
+              style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
             >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  supabaseStatus.ok ? "bg-emerald-400" : "bg-rose-400"
-                } ${supabaseStatus.ok ? "animate-pulse" : ""}`}
-              />
-              {supabaseStatus.detail}
+              <div>
+                <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+                  02 / Right now
+                </span>
+                <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+                  What people are{" "}
+                  <span className="text-acid">making</span>
+                  <span className="text-acid">.</span>
+                </h2>
+              </div>
+              <Link
+                href="/leaderboard"
+                className="shrink-0 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                see all →
+              </Link>
             </div>
-          )}
-        </div>
-      </SignedIn>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {trending.map((meme) => (
+                <TrendingCard key={meme.id} meme={meme} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </main>
+  );
+}
+
+function TrendingCard({ meme }: { meme: RankedMeme }) {
+  return (
+    <Link
+      href={`/m/${meme.id}`}
+      className="group relative block overflow-hidden rounded-2xl border border-foreground/10 bg-card/40 shadow-lg backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-acid/40 hover:shadow-acid/10"
+    >
+      <div className="relative aspect-square bg-black">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={meme.imageUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+        {meme.reactionCount > 0 && (
+          <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/65 px-2 py-0.5 text-xs font-medium text-white/95 backdrop-blur">
+            🔥 {meme.reactionCount}
+          </span>
+        )}
+      </div>
+    </Link>
   );
 }
