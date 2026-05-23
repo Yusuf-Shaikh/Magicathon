@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { MemeCard } from "@/components/meme-card";
 import { UploadZone } from "@/components/upload-zone";
 import { Button } from "@/components/ui/button";
-import { fileToCompressedDataUrl } from "@/lib/image";
+import { fileToDataUrl } from "@/lib/image";
 import type { MemeConcept } from "@/lib/meme-schema";
 import { cn } from "@/lib/utils";
 
@@ -127,7 +127,9 @@ export function MemeStudio() {
     setLastFile(file);
 
     try {
-      const dataUrl = await fileToCompressedDataUrl(file);
+      // File is already compressed by UploadZone, so just read it as a
+      // data URL — no second-pass compression (which would degrade quality).
+      const dataUrl = await fileToDataUrl(file);
       setImageDataUrl(dataUrl);
       const res = await fetch("/api/memes/generate", {
         method: "POST",
@@ -240,7 +242,7 @@ export function MemeStudio() {
             {loading && <ConceptSkeletons />}
 
             {!loading && concepts.length > 0 && imageDataUrl && (
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {concepts.map((c, i) => (
                   <MemeCard
                     key={i}
@@ -272,7 +274,7 @@ export function MemeStudio() {
 
 function ConceptSkeletons() {
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}

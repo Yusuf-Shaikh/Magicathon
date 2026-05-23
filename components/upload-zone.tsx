@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState, type DragEvent } from "react";
+import { compressFile } from "@/lib/image";
 import { cn, formatBytes } from "@/lib/utils";
 
 const CameraModal = dynamic(
@@ -25,26 +26,39 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
 
   const openPicker = () => inputRef.current?.click();
 
-  const acceptFile = (f: File) => {
-    if (!ACCEPTED.includes(f.type)) {
+  const acceptFile = async (raw: File) => {
+    if (!ACCEPTED.includes(raw.type)) {
       setError("That file isn't a PNG, JPG, or WEBP.");
       return;
     }
-    if (f.size > MAX_BYTES) {
-      setError(`Image is ${formatBytes(f.size)} — keep it under 10 MB.`);
+    if (raw.size > MAX_BYTES) {
+      setError(`Image is ${formatBytes(raw.size)} — keep it under 10 MB.`);
       return;
     }
     setError(null);
-    setFile(f);
+    setIsProcessing(true);
+
+    // Compress up-front so preview, AI call, and editor all share one
+    // optimized image. Falls back to original if compression fails.
+    let processed = raw;
+    try {
+      processed = await compressFile(raw);
+    } catch (err) {
+      console.warn("[upload-zone] compression failed, using original", err);
+    }
+
+    setFile(processed);
     setPreviewUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(f);
+      return URL.createObjectURL(processed);
     });
-    onFileAccepted?.(f);
+    setIsProcessing(false);
+    onFileAccepted?.(processed);
   };
 
   const handleTakePhoto = () => {
@@ -136,14 +150,14 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
               <button
                 type="button"
                 onClick={openPicker}
-                className="inline-flex h-8 items-center justify-center rounded-full border border-acid-deep/70 bg-acid-deep/15 px-3 font-mono text-[10px] uppercase tracking-[0.2em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink"
+                className="inline-flex h-8 items-center justify-center rounded-full bg-acid-deep px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink shadow-sm transition-colors hover:bg-acid"
               >
                 Replace
               </button>
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex h-8 items-center justify-center rounded-full border border-acid-deep/70 bg-acid-deep/15 px-3 font-mono text-[10px] uppercase tracking-[0.2em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink"
+                className="inline-flex h-8 items-center justify-center rounded-full bg-acid-deep px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink shadow-sm transition-colors hover:bg-acid"
               >
                 Remove
               </button>
@@ -204,9 +218,11 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
 
           <div className="space-y-1.5">
             <p className="text-lg font-medium">
-              {isDragging
-                ? "Drop it like it's hot"
-                : "Drop an image to get started"}
+              {isProcessing
+                ? "Optimizing your image…"
+                : isDragging
+                  ? "Drop it like it's hot"
+                  : "Drop an image to get started"}
             </p>
             <p className="text-sm text-muted-foreground">
               Selfies, pets, screenshots, reaction shots &mdash; the weirder,
@@ -221,7 +237,7 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
                 e.stopPropagation();
                 openPicker();
               }}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-acid-deep/70 bg-acid-deep/15 px-6 font-mono text-sm uppercase tracking-[0.15em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-acid-deep px-6 font-mono text-sm font-semibold uppercase tracking-[0.15em] text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:bg-acid hover:shadow-md hover:shadow-acid/40 sm:w-auto"
             >
               Upload
             </button>
@@ -231,7 +247,7 @@ export function UploadZone({ onFileAccepted, onReset }: UploadZoneProps = {}) {
                 e.stopPropagation();
                 handleTakePhoto();
               }}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-acid-deep/70 bg-acid-deep/15 px-6 font-mono text-sm uppercase tracking-[0.15em] text-acid-deep transition-colors hover:border-acid hover:bg-acid hover:text-ink sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-acid-deep px-6 font-mono text-sm font-semibold uppercase tracking-[0.15em] text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:bg-acid hover:shadow-md hover:shadow-acid/40 sm:w-auto"
             >
               <svg
                 viewBox="0 0 24 24"

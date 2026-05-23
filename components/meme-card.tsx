@@ -8,7 +8,12 @@ interface MemeCardProps {
   onClick?: () => void;
 }
 
-export function MemeCard({ concept, userImage, index, onClick }: MemeCardProps) {
+export function MemeCard({
+  concept,
+  userImage,
+  index,
+  onClick,
+}: MemeCardProps) {
   const Template = TEMPLATE_COMPONENTS[concept.template];
   const captions = normalizeCaptions(concept.template, concept.captions);
 
@@ -30,10 +35,7 @@ export function MemeCard({ concept, userImage, index, onClick }: MemeCardProps) 
         <Template userImage={userImage} captions={captions} />
       </div>
       <p className="border-t border-foreground/10 bg-card/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-hot">
-        match{" "}
-        <span className="font-bold">
-          {Math.round(concept.confidence * 100)}%
-        </span>
+        <span className="font-bold">{concept.title}</span>
       </p>
     </button>
   );
